@@ -1,4 +1,10 @@
 <template>
+<!--  role：label是一个radio，label拥有全部的radio全部能力-->
+<!--  role="radio"-->
+<!--  选中状态 true or false-->
+<!--  :aria-checked="value === label"-->
+<!--  是否可选-->
+<!--  :aria-disabled="isDisabled"-->
   <label
     class="el-radio-button"
     :class="[
