@@ -29,6 +29,11 @@
   opacity: 0;
 }
 
+// 这里不存在to，那么动画执行，
+// 进入：是从enter到 元素本身 的属性；
+// 离开：是从 原生本身属性 到 active中的定义属性值
+// 历史问题，2.18才有to，所以，active在过去就有to的能力，可以定义结束的值。
+// 如果存在to，那么动画的值会执行到to中定义的值；动画结束，原生回归本来原生状态（动画状态不保留）
 .el-zoom-in-center-enter-active,
 .el-zoom-in-center-leave-active {
   transition: all .3s cubic-bezier(.55,0,.1,1);
