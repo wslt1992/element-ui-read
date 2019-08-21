@@ -67,6 +67,7 @@
         :style="{ 'flex-grow': '1', width: inputLength / (inputWidth - 32) + '%', 'max-width': inputWidth - 42 + 'px' }"
         ref="input">
     </div>
+<!--    这里是单选 开始-->
     <el-input
       ref="reference"
       v-model="selectedLabel"
@@ -91,6 +92,7 @@
       @paste.native="debouncedOnInputChange"
       @mouseenter.native="inputHovering = true"
       @mouseleave.native="inputHovering = false">
+<!--     用来访问被插槽分发的内容。每个具名插槽 有其相应的属性 (例如：v-slot:foo 中的内容将会在 vm.$slots.foo 中被找到)。default 属性包括了所有没有被包含在具名插槽中的节点，或 v-slot:default 的内容。 -->
       <template slot="prefix" v-if="$slots.prefix">
         <slot name="prefix"></slot>
       </template>
@@ -99,6 +101,7 @@
         <i v-if="showClose" class="el-select__caret el-input__icon el-icon-circle-close" @click="handleClearClick"></i>
       </template>
     </el-input>
+<!--    这里是单选 结束-->
     <transition
       name="el-zoom-in-top"
       @before-enter="handleMenuEnter"
@@ -158,6 +161,7 @@
 
     componentName: 'ElSelect',
 
+    // 注入 在子组件也可以访问到
     inject: {
       elForm: {
         default: ''
@@ -245,12 +249,13 @@
       ElTag,
       ElScrollbar
     },
-
+    // 指令，点击了当前组件外部后触发。
     directives: { Clickoutside },
 
     props: {
       name: String,
       id: String,
+      // v-model 双向绑定的值
       value: {
         required: true
       },
@@ -267,38 +272,55 @@
           return true;
         }
       },
+      // 获取焦点，自动弹出菜单
       automaticDropdown: Boolean,
       size: String,
       disabled: Boolean,
+      // 输入内容后，框中最右侧出现 清除按钮
       clearable: Boolean,
+      // 输入值后，过滤出其中匹配的选项
       filterable: Boolean,
+      // 允许自建新的条目
       allowCreate: Boolean,
       loading: Boolean,
+      // 下拉框的类名，方便修改样式
       popperClass: String,
+      // 是否远程获取数据，配合函数remoteMethod
       remote: Boolean,
+      // 加载时显示的文字
       loadingText: String,
+      // 搜索添加无匹配时，显示的文字
       noMatchText: String,
+      // 项目为空时，显示的文字
       noDataText: String,
       remoteMethod: Function,
       filterMethod: Function,
+      // 为true后，当前组件可以进行多选。v-model对应的value值 变为 数组
       multiple: Boolean,
+      // 多选个数限制
       multipleLimit: {
         type: Number,
         default: 0
       },
+      // 提示
       placeholder: {
         type: String,
         default() {
           return t('el.select.placeholder');
         }
       },
+      // 开启后，点击select，回车可以选中第一个（可以理解为，获得了‘焦点’）
       defaultFirstOption: Boolean,
+      // 多选和搜索开启，选择第一个后，关键字保留
       reserveKeyword: Boolean,
+      // 一般都是直接绑定目标对象，然而可能发生 目标对象A 在 绑定的一个对象B里面，所以指定目标对象A是对象B的属性名
       valueKey: {
         type: String,
         default: 'value'
       },
+      // 折叠属性。多选，不展开显示，折叠显示出来
       collapseTags: Boolean,
+      // 弹出层 默认 被插入body
       popperAppendToBody: {
         type: Boolean,
         default: true
@@ -501,7 +523,7 @@
       handleMenuEnter() {
         this.$nextTick(() => this.scrollToOption(this.selected));
       },
-
+      // 判断值，点击前后时候出现变化，有变化发送change事件
       emitChange(val) {
         if (!valueEquals(this.value, val)) {
           this.$emit('change', val);
@@ -674,22 +696,34 @@
 
       handleOptionSelect(option, byClick) {
         if (this.multiple) {
+          /*多选*/
+          // 切片
           const value = (this.value || []).slice();
+          // 查找 点击的值，在value中是否存在，不存在返回-1
           const optionIndex = this.getValueIndex(value, option.value);
+          // 如果存在，删除这个值
           if (optionIndex > -1) {
             value.splice(optionIndex, 1);
           } else if (this.multipleLimit <= 0 || value.length < this.multipleLimit) {
+            /*不存在*/
+            // 判断multipleLimit为0表示无限制数量，2.判断value长度小于限制数量
             value.push(option.value);
           }
+          // v-model接收值value
           this.$emit('input', value);
+          // 判断值，点击前后时候出现变化，有变化发送change事件
           this.emitChange(value);
           if (option.created) {
+            // 猜测
+            // 当前添加的值 是搜索框没有搜索到的，点击后添加到了 选中框 中。这里为重置 输入框 内容。这个操作用于处理，开启了allow-create
             this.query = '';
             this.handleQueryChange('');
             this.inputLength = 20;
           }
           if (this.filterable) this.$refs.input.focus();
         } else {
+          /*单选*/
+
           this.$emit('input', option.value);
           this.emitChange(option.value);
           this.visible = false;
@@ -837,22 +871,27 @@
 
     created() {
       this.cachedPlaceHolder = this.currentPlaceholder = this.placeholder;
+      // 纠正输入值。多选&&不是数组，纠正为数组
       if (this.multiple && !Array.isArray(this.value)) {
         this.$emit('input', []);
       }
+      // 纠正输入值。不是多选&&是数组，纠正为字符
       if (!this.multiple && Array.isArray(this.value)) {
         this.$emit('input', '');
       }
 
+      // 1.当前vue新建函数debouncedOnInputChange 2.输入框变化去 抖动
       this.debouncedOnInputChange = debounce(this.debounce, () => {
         this.onInputChange();
       });
-
+      // 1.// 1.当前vue新建函数debouncedQueryChange 2.搜索去抖动
       this.debouncedQueryChange = debounce(this.debounce, (e) => {
         this.handleQueryChange(e.target.value);
       });
 
+      // 事件，下拉选项被点击
       this.$on('handleOptionClick', this.handleOptionSelect);
+      // 事件，。。。
       this.$on('setSelected', this.setSelected);
     },
 
