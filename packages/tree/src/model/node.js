@@ -83,11 +83,11 @@ export default class Node {
     // internal
     this.level = 0;
     this.loaded = false;
-    this.childNodes = [];
+    this.childNodes = []; //存放当前节点的子节点
     this.loading = false;
 
     if (this.parent) {
-      this.level = this.parent.level + 1;
+      this.level = this.parent.level + 1; //新节点（当前节点）级别+1
     }
 
     const store = this.store;
@@ -104,6 +104,7 @@ export default class Node {
       }
     }
 
+    // 若是初次看树形控件，可将lazy一直保持默认值false
     if (store.lazy !== true && this.data) {
       this.setData(this.data);
 
@@ -233,10 +234,10 @@ export default class Node {
         parent: this,
         store: this.store
       });
-      child = new Node(child);
+      child = new Node(child);//生成新的节点
     }
 
-    child.level = this.level + 1;
+    child.level = this.level + 1;//当前节点的子节点级别+1，存入当前节点的childNodes，与前面当前节点级别+1不同
 
     if (typeof index === 'undefined' || index < 0) {
       this.childNodes.push(child);

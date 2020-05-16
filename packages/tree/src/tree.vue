@@ -80,9 +80,9 @@
       nodeKey: String,
       checkStrictly: Boolean,
       defaultExpandAll: Boolean,
-      expandOnClickNode: {
-        type: Boolean,
-        default: true
+      expandOnClickNode: { //是否展开被 点击 节点的子孙节点
+        type: Boolean, 
+        default: true //true：展开，false:折叠
       },
       checkOnClickNode: Boolean,
       checkDescendants: {

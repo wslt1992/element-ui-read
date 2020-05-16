@@ -130,7 +130,7 @@
     data() {
       return {
         tree: null,
-        expanded: false,
+        expanded: false, //节点是否折叠。false:折叠，true:展开
         childNodeRendered: false,
         oldChecked: null,
         oldIndeterminate: null
@@ -167,13 +167,16 @@
         this.indeterminate = indeterminate;
       },
 
+      /**
+       * 节点点击事件
+      */
       handleClick() {
         const store = this.tree.store;
         store.setCurrentNode(this.node);
         this.tree.$emit('current-change', store.currentNode ? store.currentNode.data : null, store.currentNode);
         this.tree.currentNode = this;
         if (this.tree.expandOnClickNode) {
-          this.handleExpandIconClick();
+          this.handleExpandIconClick(); //图标点击事件，点击触发列表展开/折叠，并且切换图标状态
         }
         if (this.tree.checkOnClickNode && !this.node.disabled) {
           this.handleCheckChange(null, {
@@ -191,11 +194,21 @@
         this.tree.$emit('node-contextmenu', event, this.node.data, this.node, this);
       },
 
+      /**
+       * 展开/折叠图标的点击事件（三角形图标）
+       * （1）点击图标展开/折叠列表
+       * （2）切换图标状态
+       * @param expanded ：
+       * （1）false:当前是折叠，则将其展开
+       * （2）true:当前是展开，则将其折叠
+       */
       handleExpandIconClick() {
         if (this.node.isLeaf) return;
+        // 折叠
         if (this.expanded) {
           this.tree.$emit('node-collapse', this.node.data, this.node, this);
           this.node.collapse();
+          // 展开
         } else {
           this.node.expand();
           this.$emit('node-expand', this.node.data, this.node, this);
