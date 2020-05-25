@@ -29,7 +29,7 @@ class Transition {
   enter(el) {
     el.dataset.oldOverflow = el.style.overflow;
     if (el.scrollHeight !== 0) {
-      el.style.height = el.scrollHeight + 'px';
+      el.style.height = el.scrollHeight + 'px'; //设置高度
       el.style.paddingTop = el.dataset.oldPaddingTop;
       el.style.paddingBottom = el.dataset.oldPaddingBottom;
     } else {
@@ -47,7 +47,7 @@ class Transition {
   afterEnter(el) {
     // for safari: remove class then reset height is necessary
     removeClass(el, 'collapse-transition');
-    el.style.height = '';
+    el.style.height = ''; //取消高度设置，避免下一级列表展开后无法全部显示
     el.style.overflow = el.dataset.oldOverflow;
   }
 
@@ -61,7 +61,7 @@ class Transition {
     el.dataset.oldPaddingBottom = el.style.paddingBottom;
     el.dataset.oldOverflow = el.style.overflow;
 
-    el.style.height = el.scrollHeight + 'px';
+    el.style.height = el.scrollHeight + 'px'; //展开动画后高度设置被取消，需要重新获取并设置，动画才能生效
     el.style.overflow = 'hidden';
   }
 

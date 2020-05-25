@@ -237,7 +237,7 @@ export default class Node {
       child = new Node(child);//生成新的节点
     }
 
-    child.level = this.level + 1;//当前节点的子节点级别+1，存入当前节点的childNodes，与前面当前节点级别+1不同
+    child.level = this.level + 1;//当前节点存放子节点进入childrenNodes时，标识子节点的级别。与前面当前节点级别+1不同
 
     if (typeof index === 'undefined' || index < 0) {
       this.childNodes.push(child);

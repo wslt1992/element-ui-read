@@ -50,6 +50,7 @@
       <node-content :node="node"></node-content>
     </div>
     <el-collapse-transition>
+      <!-- expanded：展开/折叠 -->
       <div
         class="el-tree-node__children"
         v-if="!renderAfterExpand || childNodeRendered"
@@ -105,6 +106,7 @@
     components: {
       ElCollapseTransition,
       ElCheckbox,
+      // 渲染NodeContent
       NodeContent: {
         props: {
           node: {
@@ -175,15 +177,15 @@
         store.setCurrentNode(this.node);
         this.tree.$emit('current-change', store.currentNode ? store.currentNode.data : null, store.currentNode);
         this.tree.currentNode = this;
-        if (this.tree.expandOnClickNode) {
+        if (this.tree.expandOnClickNode) { //根据传入的条件判断是否展开节点列表（请在tree.vue查看expandOnClickNode）
           this.handleExpandIconClick(); //图标点击事件，点击触发列表展开/折叠，并且切换图标状态
         }
         if (this.tree.checkOnClickNode && !this.node.disabled) {
-          this.handleCheckChange(null, {
+          this.handleCheckChange(null, { //当前选中节点变化时触发的事件,官方文档Events下可查
             target: { checked: !this.node.checked }
           });
         }
-        this.tree.$emit('node-click', this.node.data, this.node, this);
+        this.tree.$emit('node-click', this.node.data, this.node, this);//节点被点击时的回调，官方文档Events下可查
       },
 
       handleContextMenu(event) {
@@ -205,13 +207,13 @@
       handleExpandIconClick() {
         if (this.node.isLeaf) return;
         // 折叠
-        if (this.expanded) {
-          this.tree.$emit('node-collapse', this.node.data, this.node, this);
-          this.node.collapse();
+        if (this.expanded) { //当前组件中的expanded,不是Node中的,在监听"node.expanded"时，改变当前组件的expanded
+          this.tree.$emit('node-collapse', this.node.data, this.node, this);//节点被关闭时触发的事件，官方文档Events下可查
+          this.node.collapse();//node.js中查看完整方法,改变Node中expanded的值
           // 展开
         } else {
-          this.node.expand();
-          this.$emit('node-expand', this.node.data, this.node, this);
+          this.node.expand(); //node.js中查看完整方法,改变Node中expanded的值
+          this.$emit('node-expand', this.node.data, this.node, this);//节点被展开时触发的事件，官方文档Events下可查
         }
       },
 
