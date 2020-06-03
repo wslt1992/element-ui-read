@@ -77,8 +77,8 @@
         type: Boolean,
         default: true
       },
-      nodeKey: String,
-      checkStrictly: Boolean,
+      nodeKey: String, //节点key值，或者是id，(没有传入key或者id时，会默认生成id序列作为key)
+      checkStrictly: Boolean,//在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false
       defaultExpandAll: Boolean,
       expandOnClickNode: { //是否展开被 点击 节点的子孙节点
         type: Boolean, 
@@ -93,7 +93,7 @@
         type: Boolean,
         default: true
       },
-      defaultCheckedKeys: Array,
+      defaultCheckedKeys: Array, //默认的已选项key值数组
       defaultExpandedKeys: Array,
       currentNodeKey: [String, Number],
       renderContent: Function,
@@ -182,6 +182,9 @@
         this.store.filter(value);
       },
 
+      /**
+       * 获取节点key值
+       */
       getNodeKey(node) {
         return getNodeKey(this.nodeKey, node.data);
       },

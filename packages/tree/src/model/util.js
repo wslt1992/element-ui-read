@@ -10,6 +10,9 @@ export const markNodeData = function(node, data) {
   });
 };
 
+/**
+ * 返回节点key,若没有key值，则返回node的id值
+ */
 export const getNodeKey = function(key, data) {
   if (!key) return data[NODE_KEY];
   return data[key];

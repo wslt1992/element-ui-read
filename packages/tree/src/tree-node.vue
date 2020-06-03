@@ -217,6 +217,9 @@
         }
       },
 
+      /**
+       * 复选框-选中状态更新
+       */
       handleCheckChange(value, ev) {
         this.node.setChecked(ev.target.checked, !this.tree.checkStrictly);
         this.$nextTick(() => {

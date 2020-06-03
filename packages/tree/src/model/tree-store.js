@@ -1,6 +1,10 @@
 import Node from './node';
 import { getNodeKey } from './util';
 
+/**
+ * tree-store作用
+ * (1) 生成节点映射对象nodesMap，便于指定某些节点展开或者选中，key或者id作为索引
+ */
 export default class TreeStore {
   constructor(options) {
     this.currentNode = null;
@@ -12,21 +16,22 @@ export default class TreeStore {
       }
     }
 
-    this.nodesMap = {};
+    this.nodesMap = {}; //存放节点,一个节点映射对象，便于指定某些节点展开或者选中
 
     this.root = new Node({
       data: this.data,
       store: this
     });
 
-    if (this.lazy && this.load) {
+    // load:加载子树数据的方法，仅当 lazy 属性为true 时生效
+    if (this.lazy && this.load) { 
       const loadFn = this.load;
       loadFn(this.root, (data) => {
         this.root.doCreateChildren(data);
         this._initDefaultCheckedNodes();
       });
     } else {
-      this._initDefaultCheckedNodes();
+      this._initDefaultCheckedNodes(); //有默认选中的选项时，初始化所有选项选中状态
     }
   }
 
@@ -105,6 +110,10 @@ export default class TreeStore {
     }
   }
 
+  /**
+   * 有默认选中的选项时，初始化所有选项选中状态
+   * 根据数据defaultCheckedKeys判断
+   */
   _initDefaultCheckedNodes() {
     const defaultCheckedKeys = this.defaultCheckedKeys || [];
     const nodesMap = this.nodesMap;
@@ -133,6 +142,9 @@ export default class TreeStore {
     }
   }
 
+  /**
+   * 节点以key值为键，存入nodeMap,使用者没有传入key（nodeKey属性）值,则以id代替
+   */
   registerNode(node) {
     const key = this.key;
     if (!key || !node || !node.data) return;
