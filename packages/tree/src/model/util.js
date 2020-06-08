@@ -11,7 +11,9 @@ export const markNodeData = function(node, data) {
 };
 
 /**
- * 返回节点key,若没有key值，则返回node的id值
+ * 返回节点唯一标识的值
+ * @param  key:唯一标识字段名
+ * @param  data:节点数据，纯数据
  */
 export const getNodeKey = function(key, data) {
   if (!key) return data[NODE_KEY];

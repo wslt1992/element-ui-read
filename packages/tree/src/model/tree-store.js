@@ -143,7 +143,9 @@ export default class TreeStore {
   }
 
   /**
-   * 节点以key值为键，存入nodeMap,使用者没有传入key（nodeKey属性）值,则以id代替
+   * 节点存入节点映射对象里。
+   * 映射对象里的字段：唯一标识的值
+   * 映射对象里的值： 当前生成的节点
    */
   registerNode(node) {
     const key = this.key;

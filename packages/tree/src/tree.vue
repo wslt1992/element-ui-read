@@ -77,7 +77,11 @@
         type: Boolean,
         default: true
       },
-      nodeKey: String, //节点key值，或者是id，(没有传入key或者id时，会默认生成id序列作为key)
+      /**
+       * nodeKey:唯一标识字段名，并不是值，值需要再传入的数据里
+       *      指定某些节点展开/选中等用
+       */
+      nodeKey: String, 
       checkStrictly: Boolean,//在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false
       defaultExpandAll: Boolean,
       expandOnClickNode: { //是否展开被 点击 节点的子孙节点
@@ -183,7 +187,11 @@
       },
 
       /**
-       * 获取节点key值
+       * 获取节点唯一标识的值
+       * @param node:节点对象
+       * 传入值  nodeKey:唯一标识字段名
+       * 传入值  data:节点的数据，传入的未处理为节点的纯数据
+       *             如：data:{children:[...],id:1,label:"一级"}
        */
       getNodeKey(node) {
         return getNodeKey(this.nodeKey, node.data);

@@ -100,7 +100,7 @@ export default class Node {
     if (!store) {
       throw new Error('[Node]store is required!');
     }
-    store.registerNode(this); //节点以key值为键，存入nodeMap,使用者没有传入key（nodeKey属性）值或者id,则以自动生成的id序列代替
+    store.registerNode(this); //当前节点存入映射对象
 
     const props = store.props;
     if (props && typeof props.isLeaf !== 'undefined') {
@@ -125,7 +125,7 @@ export default class Node {
     }
     if (!this.data) return;
     const defaultExpandedKeys = store.defaultExpandedKeys;
-    const key = store.key;
+    const key = store.key; 
     if (key && defaultExpandedKeys && defaultExpandedKeys.indexOf(this.key) !== -1) {
       this.expand(null, store.autoExpandParent);
     }
