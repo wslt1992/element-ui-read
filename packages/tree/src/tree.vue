@@ -78,8 +78,8 @@
         default: true
       },
       /**
-       * nodeKey:唯一标识字段名，并不是值，在data里有 nodeKey:值 的数据
-       *      （(1)定某些节点展开/选中等用 (2)作为vue生成dom节点的唯一标识
+       * nodeKey:唯一标识字段名，并不是值，这个字段的数据在需要传入的data数据对象里
+       *      (1)定某些节点展开/选中等用 (2)作为vue生成dom节点的唯一标识
        */
       nodeKey: String, 
       checkStrictly: Boolean,//在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false
