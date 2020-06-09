@@ -157,6 +157,17 @@
     },
 
     methods: {
+       /**
+       * 1、定位：此处是tree-node.vue哦~~  
+       * 2、作用：获取节点唯一标识的值
+       *    *注意*：这里的唯一标识有两个作用
+       *        (1) 指定某些节点展开/折叠或者选中等操作时，查询这些节点用的标识值
+       *        (2) vue在遍历循环生成这些dom节点时，需要的key值
+       * @param node:节点对象
+       * 传入值  nodeKey:唯一标识字段名
+       * 传入值  data:节点的数据，传入的未处理为节点的纯数据
+       *             如：data:{children:[...],id:1,label:"一级"}
+       */
       getNodeKey(node) {
         return getNodeKey(this.tree.nodeKey, node.data);
       },
