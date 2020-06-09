@@ -238,7 +238,7 @@ export default class Node {
       }
       objectAssign(child, {
         parent: this,
-        store: this.store
+        store: this.store //(1)在生成节点映射对象时需要
       });
       child = new Node(child);//生成新的节点
     }
