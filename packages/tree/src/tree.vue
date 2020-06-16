@@ -93,7 +93,7 @@
         type: Boolean,
         default: false
       },
-      autoExpandParent: {
+      autoExpandParent: { //展开子节点的时候是否自动展开父节点
         type: Boolean,
         default: true
       },

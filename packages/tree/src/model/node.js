@@ -92,6 +92,9 @@ export default class Node {
     this.childNodes = []; //存放当前节点的子节点
     this.loading = false;
 
+    /**
+     * 当前节点级别计算
+     */
     if (this.parent) {
       this.level = this.parent.level + 1; //若有父节点，（当前节点）级别+1
     }
@@ -100,7 +103,10 @@ export default class Node {
     if (!store) {
       throw new Error('[Node]store is required!');
     }
-    store.registerNode(this); //当前节点存入映射对象
+    /**
+     * 当前节点存入映射对象
+     */
+    store.registerNode(this); 
 
     const props = store.props;
     if (props && typeof props.isLeaf !== 'undefined') {
@@ -113,7 +119,9 @@ export default class Node {
     // 若是初次看树形控件，可将lazy一直保持默认值false
     if (store.lazy !== true && this.data) {
       this.setData(this.data);
-
+      /**
+       * 是否默认展开所有节点，true:是，false：否
+       */
       if (store.defaultExpandAll) {
         this.expanded = true;
       }
@@ -124,10 +132,13 @@ export default class Node {
       markNodeData(this, this.data);
     }
     if (!this.data) return;
-    const defaultExpandedKeys = store.defaultExpandedKeys;
+    /**
+     * 当前节点是否是默认展开项
+     */
+    const defaultExpandedKeys = store.defaultExpandedKeys; //获得需要默认展开的项的key值数组
     const key = store.key; 
-    if (key && defaultExpandedKeys && defaultExpandedKeys.indexOf(this.key) !== -1) {
-      this.expand(null, store.autoExpandParent);
+    if (key && defaultExpandedKeys && defaultExpandedKeys.indexOf(this.key) !== -1) { //需要展开的key值数组中是否存在当前节点的key值
+      this.expand(null, store.autoExpandParent); //展开当前节点以及父
     }
 
     if (key && store.currentNodeKey !== undefined && this.key === store.currentNodeKey) {
@@ -238,7 +249,7 @@ export default class Node {
       }
       objectAssign(child, {
         parent: this,
-        store: this.store //(1)在生成节点映射对象时需要
+        store: this.store //(1)在生成节点映射对象时需要,在构造函数里：store.registerNode
       });
       child = new Node(child);//生成新的节点
     }
@@ -304,6 +315,7 @@ export default class Node {
     }
   }
 
+  // 展开节点
   expand(callback, expandParent) {
     const done = () => {
       if (expandParent) {
