@@ -2,19 +2,22 @@ import objectAssign from 'element-ui/src/utils/merge';
 import { markNodeData, NODE_KEY } from './util';
 import { arrayFindIndex } from 'element-ui/src/utils/util';
 
+/**
+ * 子节点选中状态
+*/
 export const getChildState = node => {
-  let all = true;
-  let none = true;
-  let allWithoutDisable = true;
+  let all = true; //是否所有的选项都被选中，（true：是，false：否）
+  let none = true; //是否所有的选项都是未被选中，（true:是，false:否）
+  let allWithoutDisable = true; //未被选中的选项：是否全被禁用了（true:是，false:否）-----？待确定这个分析
   for (let i = 0, j = node.length; i < j; i++) {
     const n = node[i];
-    if (n.checked !== true || n.indeterminate) {
+    if (n.checked !== true || n.indeterminate) {//未选中选项或者是不确定状态的选项
       all = false;
-      if (!n.disabled) {
+      if (!n.disabled) {//未选中的选项，有 未被禁用的
         allWithoutDisable = false;
       }
     }
-    if (n.checked !== false || n.indeterminate) {
+    if (n.checked !== false || n.indeterminate) { //选中的选项或者不确定状态的选项
       none = false;
     }
   }
@@ -22,6 +25,9 @@ export const getChildState = node => {
   return { all, none, allWithoutDisable, half: !all && !none };
 };
 
+/**
+ * 重新设置父级的选框状态
+ */
 const reInitChecked = function(node) {
   if (node.childNodes.length === 0) return;
 
@@ -40,7 +46,7 @@ const reInitChecked = function(node) {
   const parent = node.parent;
   if (!parent || parent.level === 0) return;
 
-  if (!node.store.checkStrictly) {
+  if (!node.store.checkStrictly) { //严格遵守父子关系的情况下，一直往上更新父级选框状态
     reInitChecked(parent);
   }
 };
@@ -67,7 +73,7 @@ export default class Node {
     this.id = nodeIdSeed++;
     this.text = null;
     this.checked = false;
-    this.indeterminate = false;
+    this.indeterminate = false;//表示复选框为不确定状态
     this.data = null;
     this.expanded = false;
     this.parent = null;
@@ -83,18 +89,18 @@ export default class Node {
     // internal
     this.level = 0;
     this.loaded = false;
-    this.childNodes = [];
+    this.childNodes = []; //存放当前节点的子节点
     this.loading = false;
 
     if (this.parent) {
-      this.level = this.parent.level + 1;
+      this.level = this.parent.level + 1; //若有父节点，（当前节点）级别+1
     }
 
     const store = this.store;
     if (!store) {
       throw new Error('[Node]store is required!');
     }
-    store.registerNode(this);
+    store.registerNode(this); //当前节点存入映射对象
 
     const props = store.props;
     if (props && typeof props.isLeaf !== 'undefined') {
@@ -104,6 +110,7 @@ export default class Node {
       }
     }
 
+    // 若是初次看树形控件，可将lazy一直保持默认值false
     if (store.lazy !== true && this.data) {
       this.setData(this.data);
 
@@ -118,7 +125,7 @@ export default class Node {
     }
     if (!this.data) return;
     const defaultExpandedKeys = store.defaultExpandedKeys;
-    const key = store.key;
+    const key = store.key; 
     if (key && defaultExpandedKeys && defaultExpandedKeys.indexOf(this.key) !== -1) {
       this.expand(null, store.autoExpandParent);
     }
@@ -231,12 +238,12 @@ export default class Node {
       }
       objectAssign(child, {
         parent: this,
-        store: this.store
+        store: this.store //(1)在生成节点映射对象时需要
       });
-      child = new Node(child);
+      child = new Node(child);//生成新的节点
     }
 
-    child.level = this.level + 1;
+    child.level = this.level + 1;//当前节点存放子节点进入childrenNodes时，标识子节点的级别。与前面当前节点级别+1不同
 
     if (typeof index === 'undefined' || index < 0) {
       this.childNodes.push(child);
@@ -353,6 +360,15 @@ export default class Node {
     this.isLeaf = false;
   }
 
+  /**
+   * @param value:点击选项时，传入值
+   * @param deep:是否深度遍历（子节点），并设置选中状态
+   * @param recursion:是否往上遍历父及祖先节点，并设置选中状态
+   * @param passValue:--------分析不精确，需要继续考究^_^
+   *                  当前节点/父节点/祖先节点的选中状态，
+   *                  (1) 没有传入值时，会根据当前节点的value值计算
+   *                  说明：这个是判断子节点或者孙子节点选框状态的判断条件之一
+  */
   setChecked(value, deep, recursion, passValue) {
     this.indeterminate = value === 'half';
     this.checked = value === true;
@@ -362,18 +378,19 @@ export default class Node {
     if (!(this.shouldLoadData() && !this.store.checkDescendants)) {
       let { all, allWithoutDisable } = getChildState(this.childNodes);
 
-      if (!this.isLeaf && (!all && allWithoutDisable)) {
+      if (!this.isLeaf && (!all && allWithoutDisable)) { //不是叶子节点 && (子节点没有全部选中&& ？ )
         this.checked = false;
         value = false;
       }
-
+      
+      // 深度遍历子节点，并设置状态
       const handleDescendants = () => {
         if (deep) {
           const childNodes = this.childNodes;
           for (let i = 0, j = childNodes.length; i < j; i++) {
             const child = childNodes[i];
-            passValue = passValue || value !== false;
-            const isCheck = child.disabled ? child.checked : passValue;
+            passValue = passValue || value !== false; //得到当前节点/父节点/祖先节点的选中状态
+            const isCheck = child.disabled ? child.checked : passValue; //禁用返回自己状态，未被禁用则返回当前节点/父节点/祖先节点的选中状态
             child.setChecked(isCheck, deep, true, passValue);
           }
           const { half, all } = getChildState(childNodes);
@@ -401,7 +418,7 @@ export default class Node {
     const parent = this.parent;
     if (!parent || parent.level === 0) return;
 
-    if (!recursion) {
+    if (!recursion) { //更新父级选项的状态
       reInitChecked(parent);
     }
   }

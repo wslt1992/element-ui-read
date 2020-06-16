@@ -50,6 +50,7 @@
       <node-content :node="node"></node-content>
     </div>
     <el-collapse-transition>
+      <!-- expanded：展开/折叠 -->
       <div
         class="el-tree-node__children"
         v-if="!renderAfterExpand || childNodeRendered"
@@ -105,6 +106,7 @@
     components: {
       ElCollapseTransition,
       ElCheckbox,
+      // 渲染NodeContent
       NodeContent: {
         props: {
           node: {
@@ -130,7 +132,7 @@
     data() {
       return {
         tree: null,
-        expanded: false,
+        expanded: false, //节点是否折叠。false:折叠，true:展开
         childNodeRendered: false,
         oldChecked: null,
         oldIndeterminate: null
@@ -155,6 +157,17 @@
     },
 
     methods: {
+       /**
+       * 1、定位：此处是tree-node.vue哦~~  
+       * 2、作用：获取节点唯一标识的值
+       *    *注意*：这里的唯一标识有两个作用
+       *        (1) 指定某些节点展开/折叠或者选中等操作时，查询这些节点用的标识值
+       *        (2) vue在遍历循环生成这些dom节点时，需要的key值
+       * @param node:节点对象
+       * 传入值  nodeKey:唯一标识字段名
+       * 传入值  data:节点的数据，传入的未处理为节点的纯数据
+       *             如：data:{children:[...],id:1,label:"一级"}
+       */
       getNodeKey(node) {
         return getNodeKey(this.tree.nodeKey, node.data);
       },
@@ -167,20 +180,23 @@
         this.indeterminate = indeterminate;
       },
 
+      /**
+       * 节点点击事件
+      */
       handleClick() {
         const store = this.tree.store;
         store.setCurrentNode(this.node);
         this.tree.$emit('current-change', store.currentNode ? store.currentNode.data : null, store.currentNode);
         this.tree.currentNode = this;
-        if (this.tree.expandOnClickNode) {
-          this.handleExpandIconClick();
+        if (this.tree.expandOnClickNode) { //根据传入的条件判断是否展开节点列表（请在tree.vue查看expandOnClickNode）
+          this.handleExpandIconClick(); //图标点击事件，点击触发列表展开/折叠，并且切换图标状态
         }
         if (this.tree.checkOnClickNode && !this.node.disabled) {
-          this.handleCheckChange(null, {
+          this.handleCheckChange(null, { //当前选中节点变化时触发的事件,官方文档Events下可查
             target: { checked: !this.node.checked }
           });
         }
-        this.tree.$emit('node-click', this.node.data, this.node, this);
+        this.tree.$emit('node-click', this.node.data, this.node, this);//节点被点击时的回调，官方文档Events下可查
       },
 
       handleContextMenu(event) {
@@ -191,17 +207,30 @@
         this.tree.$emit('node-contextmenu', event, this.node.data, this.node, this);
       },
 
+      /**
+       * 展开/折叠图标的点击事件（三角形图标）
+       * （1）点击图标展开/折叠列表
+       * （2）切换图标状态
+       * @param expanded ：
+       * （1）false:当前是折叠，则将其展开
+       * （2）true:当前是展开，则将其折叠
+       */
       handleExpandIconClick() {
         if (this.node.isLeaf) return;
-        if (this.expanded) {
-          this.tree.$emit('node-collapse', this.node.data, this.node, this);
-          this.node.collapse();
+        // 折叠
+        if (this.expanded) { //当前组件中的expanded,不是Node中的,在监听"node.expanded"时，改变当前组件的expanded
+          this.tree.$emit('node-collapse', this.node.data, this.node, this);//节点被关闭时触发的事件，官方文档Events下可查
+          this.node.collapse();//node.js中查看完整方法,改变Node中expanded的值
+          // 展开
         } else {
-          this.node.expand();
-          this.$emit('node-expand', this.node.data, this.node, this);
+          this.node.expand(); //node.js中查看完整方法,改变Node中expanded的值
+          this.$emit('node-expand', this.node.data, this.node, this);//节点被展开时触发的事件，官方文档Events下可查
         }
       },
 
+      /**
+       * 复选框-选中状态更新
+       */
       handleCheckChange(value, ev) {
         this.node.setChecked(ev.target.checked, !this.tree.checkStrictly);
         this.$nextTick(() => {
