@@ -11,13 +11,13 @@ export const getChildState = node => {
   let allWithoutDisable = true; //未被选中的选项：是否全被禁用了（true:是，false:否）-----？待确定这个分析
   for (let i = 0, j = node.length; i < j; i++) {
     const n = node[i];
-    if (n.checked !== true || n.indeterminate) {//未选中选项或者是不确定状态的选项
+    if (n.checked !== true || n.indeterminate) {//有未选中选项 或是 不确定状态的选项
       all = false;
       if (!n.disabled) {//未选中的选项，有 未被禁用的
         allWithoutDisable = false;
       }
     }
-    if (n.checked !== false || n.indeterminate) { //选中的选项或者不确定状态的选项
+    if (n.checked !== false || n.indeterminate) { //有选中的选项 或者 不确定状态的选项
       none = false;
     }
   }
